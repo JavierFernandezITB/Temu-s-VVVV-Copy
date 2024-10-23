@@ -5,20 +5,23 @@ using UnityEngine;
 public class CameraMove : MonoBehaviour
 {
     public GameObject character;
-    private float defaultY;
-    private float defaultZ;
-       
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        defaultY = transform.position.y;
-        defaultZ = transform.position.z;
-    }
-
-    // Update is called once per frame
+    public float offsetY = 3.0f;
+    public float smoothSpeed = 0.005f;
+    private Vector3 targetPosition;
     void Update()
     {
-        transform.position = new Vector3(character.transform.position.x, defaultY, defaultZ);
+        try
+        {
+            float newY = character.GetComponent<SpriteRenderer>().flipY ?
+                         character.transform.position.y :
+                         character.transform.position.y + offsetY;
+
+            targetPosition = new Vector3(character.transform.position.x, newY, transform.position.z);
+            transform.position = Vector3.Lerp(transform.position, targetPosition, smoothSpeed);
+        }
+        catch
+        {
+            character = GameObject.Find("/Character");
+        }
     }
 }

@@ -8,7 +8,7 @@ public class CharacterMovement : MonoBehaviour
     private Rigidbody2D rb2d;
     private bool moveRight = false;
     private bool moveLeft = false;
-    private bool isGravitySwitched = false;
+    public bool isGravitySwitched = false;
     private Animator characterAnimator;
     private SpriteRenderer characterSprite;
 
@@ -23,23 +23,17 @@ public class CharacterMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            moveRight = true;
-        }
-        if (Input.GetKeyUp(KeyCode.D))
-        {
-            moveRight = false;
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            moveLeft = true;
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            moveLeft = false;
-        }
-        if (Input.GetKeyDown(KeyCode.Space) && rb2d.velocity.y == 0)
+        if (Input.GetKeyDown(KeyCode.D)) moveRight = true;
+        if (Input.GetKeyUp(KeyCode.D)) moveRight = false;
+        if (Input.GetKeyDown(KeyCode.A)) moveLeft = true;
+        if (Input.GetKeyUp(KeyCode.A)) moveLeft = false;
+
+        RaycastHit2D[] raycastHitUp = Physics2D.RaycastAll(transform.position, Vector2.up, 1.0f);
+        Debug.DrawRay(transform.position, Vector2.up, Color.green);
+        RaycastHit2D[] raycastHitDown = Physics2D.RaycastAll(transform.position, Vector2.down, 1.0f);
+        Debug.DrawRay(transform.position, Vector2.down, Color.red);
+
+        if (Input.GetKeyDown(KeyCode.Space) && (raycastHitUp.Length > 1 || raycastHitDown.Length > 1))
         {
             isGravitySwitched = !isGravitySwitched;
         }
@@ -52,20 +46,22 @@ public class CharacterMovement : MonoBehaviour
             characterAnimator.SetBool("isWalking", true);
         else
             characterAnimator.SetBool("isWalking", false);
+
         if (moveRight)
         {
-            characterSprite.flipX = false;
+            characterSprite.transform.localScale = new Vector3(1, 1, 1);
             rb2d.velocity = new Vector2(1 * speed, rb2d.velocity.y);
         }
         else if (moveLeft)
         {
-            characterSprite.flipX = true;
+            characterSprite.transform.localScale = new Vector3(-1, 1, 1);
             rb2d.velocity = new Vector2(-1 * speed, rb2d.velocity.y);
         }
         else
         {
             rb2d.velocity = new Vector2(0, rb2d.velocity.y);
         }
+
         if (isGravitySwitched)
         {
             characterSprite.flipY = !characterSprite.flipY;
